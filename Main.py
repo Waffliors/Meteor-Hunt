@@ -35,7 +35,7 @@ while not done:
             click_do_mouse.play()
             # Fire a bullet if the user clicks the mmouse button
             shot = bullet.Bullet()
-            # Set the bullet sp ot os wjere tje player is
+            # Set the bullet sp ot os where the player is
             shot.rect.x = player.update()[0]+48
             shot.rect.y = player.update()[1]-4
             #Add the bullet to the lists
@@ -49,8 +49,7 @@ while not done:
     # Calculate mechanics for each bullet
     for shot in bullet_list:
         #Remove the bullet if it fliees up off the screen
-        if shot.rect.y < -600:
-            print(shot.rect.x, shot.rect.y)
+        if shot.rect.y < -40:
             bullet_list.remove(shot)
             all_sprites_list.remove(shot)
 
