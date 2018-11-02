@@ -10,8 +10,8 @@ pygame.init()
 clock = pygame.time.Clock()
 pygame.display.set_caption("Meteor Hunt")
 click_do_mouse = pygame.mixer.Sound("./Sounds/laser5.ogg")
-background_position = [0, 0]#-2000
-background_image = pygame.image.load("./Images/Background/saturn_family1.jpg").convert()
+background_position = [0, -2000]
+background_image = pygame.image.load("./Images/Background/Stars (Blue).png").convert()
 
 player = player.Player()
 
@@ -84,10 +84,10 @@ while not done:
     Constants.screen.blit(player.image, pos)
 
     # Roll the background
-    '''if background_position[1] >= 0:
+    if background_position[1] >= 0:
         background_position[1] = -2000
     else:
-        background_position[1] += 2'''
+        background_position[1] += 2
 
     # Draw all the sprites
     bullet_list.draw(Constants.screen)
