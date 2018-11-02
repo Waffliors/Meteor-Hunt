@@ -1,0 +1,16 @@
+import pygame
+
+# Dimensões da tela
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+
+# Cores
+BLACK = (0, 0, 0)
+BROWN = (163, 127, 44)
+WHITE = (255, 255, 255)
+
+ASTEROID_ANIMATION_SPEED = 5
+ASTEROID_MOVE_SPEED = 0
+ASTEROID_SUMMON_TIME = 0
+BULLET_SPEED = 10

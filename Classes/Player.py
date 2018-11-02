@@ -13,13 +13,17 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load("./Images/space_ship.png").convert()
         self.image.set_colorkey(BLACK)
 
+        self.rect = self.image.get_rect()
 
     def update(self):
         """ Update the player's position. """
         # Get the current mouse position. This returns the position
         # as a list of two numbers.
-        return pygame.mouse.get_pos()
+        pos = pygame.mouse.get_pos()
 
+        # Set the player x position to the mouse x position
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
 
 
 
