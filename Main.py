@@ -72,7 +72,13 @@ while not done:
         for asteroid in meteors_hit_list:
             meteor_list.remove(asteroid)
             bullet_list.remove(shot)
+            all_sprites_list.remove(shot)
 
+    #Remove player if it's hited
+    player_hit_list = pygame.sprite.spritecollide(player, meteor_list, True)
+
+    if player_hit_list:
+        all_sprites_list.remove(player)
 
     Constants.screen.blit(background_image, background_position)
     Constants.screen.blit(player.image, pos)
@@ -84,7 +90,8 @@ while not done:
         background_position[1] += 2'''
 
     # Draw all the sprites
-    bullet_list.draw(Constants.screen)
+    all_sprites_list.draw(Constants.screen)
+    #bullet_list.draw(Constants.screen)
     meteor_list.draw(Constants.screen)
 
     pygame.display.flip()
