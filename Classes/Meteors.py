@@ -12,8 +12,10 @@ class Meteor(pygame.sprite.Sprite):
 
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
+        self.asteroid_image = pygame.image.load("Images/Asteroid/Asteroid 01.png")
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
+        self.loop_asteroid = 0
 
         # Fetch the rectangle object that has the dimensions of the image
         # image.
