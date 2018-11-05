@@ -13,6 +13,7 @@ click_do_mouse = pygame.mixer.Sound("./Sounds/laser5.ogg")
 background_position = [0, -2000]
 background_image = pygame.image.load("./Images/Background/Stars (Blue).png").convert()
 loop_game = 0
+pygame.mouse.set_visible(False)
 
 player = player.Player()
 
