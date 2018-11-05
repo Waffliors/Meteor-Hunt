@@ -11,7 +11,7 @@ clock = pygame.time.Clock()
 pygame.display.set_caption("Meteor Hunt")
 click_do_mouse = pygame.mixer.Sound("./Sounds/laser5.ogg")
 background_position = [0, -1200]
-background_image = pygame.image.load("./Images/Background/blue.png").convert()
+background_image = pygame.image.load("Images/Background/darkPurple.png").convert()
 loop_game = 0
 pygame.mouse.set_visible(False)
 
@@ -47,15 +47,15 @@ while not done:
             # Fire a bullet if the user clicks the mouse button
             shot = bullet.Bullet()
             # Set the bullet to where the player is
-            shot.rect.x = pos[0]+48
-            shot.rect.y = pos[1]-6
+            shot.rect.x = pos[0]+44
+            shot.rect.y = pos[1]-60
             #Add the bullet to the lists
             all_sprites_list.add(shot)
             bullet_list.add(shot)
 
     # Summon meteors
     if loop_game % Constants.ASTEROID_SUMMON_TIME == 0:
-        asteroid = meteor.Meteor(Constants.BROWN, 20, 15)
+        asteroid = meteor.Meteor()
         asteroid.reposicionar(Constants.X)
         meteor_list.add(asteroid)
     loop_game += 1
@@ -64,6 +64,7 @@ while not done:
     #Call update method on all the sprites
     all_sprites_list.update()
     meteor_list.update(Constants.X, Constants.Y)
+    bullet_list.update()
     # Calculate mechanics for each bullet
     for shot in bullet_list:
         #Remove the bullet if it fliees up off the screen
@@ -98,8 +99,9 @@ while not done:
     # Draw all the sprites
     all_sprites_list.draw(Constants.screen)
     meteor_list.draw(Constants.screen)
+    bullet_list.draw(Constants.screen)
 
-    pygame.display.flip()
+    pygame.display.update()
 
     clock.tick(60)
 

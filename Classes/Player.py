@@ -1,4 +1,5 @@
 import pygame
+import Constants
 
 BLACK = (0, 0, 0)
 
@@ -20,10 +21,26 @@ class Player(pygame.sprite.Sprite):
         # Get the current mouse position. This returns the position
         # as a list of two numbers.
         pos = pygame.mouse.get_pos()
-
-        # Set the player x position to the mouse x position
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
+        # Set the player x position to the mouse x position]
+        if self.rect.x < 10:
+            pygame.mouse.set_pos(11, pos[1])
+            self.rect.x = pos[0]
+            self.rect.y = pos[1]
+        elif self.rect.x > Constants.X - 110:
+            pygame.mouse.set_pos(Constants.X - 111, pos[1])
+            self.rect.x = pos[0]
+            self.rect.y = pos[1]
+        elif self.rect.y < 10:
+            pygame.mouse.set_pos(pos[0], 11)
+            self.rect.x = pos[0]
+            self.rect.y = pos[1]
+        elif self.rect.y > Constants.Y - 85:
+            pygame.mouse.set_pos(pos[0], Constants.Y - 86)
+            self.rect.x = pos[0]
+            self.rect.y = pos[1]
+        else:
+            self.rect.x = pos[0]
+            self.rect.y = pos[1]
 
 
 

@@ -4,7 +4,7 @@ import Constants
 
 class Meteor(pygame.sprite.Sprite):
 
-    def __init__(self, color, width, height):
+    def __init__(self):
         """ Constructor. Pass in the color of the block,
         and its size. """
 
@@ -13,7 +13,7 @@ class Meteor(pygame.sprite.Sprite):
 
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
-        self.image = pygame.image.load("Images/Meteors/meteorBrown_big1.png")#pygame.Surface([width, height])
+        self.image = pygame.image.load("Images/Meteors/meteorBrown_big1.png")
         self.loop_asteroid = 0
 
         # Fetch the rectangle object that has the dimensions of the image
@@ -24,7 +24,7 @@ class Meteor(pygame.sprite.Sprite):
 
     def reposicionar(self, screen_width):
         self.rect.y = random.randrange(-100, -10)
-        self.rect.x = random.randrange(0, screen_width)
+        self.rect.x = random.randrange(50, screen_width - 130)
 
     def update(self, screen_width, screen_height):
         self.rect.y += 1

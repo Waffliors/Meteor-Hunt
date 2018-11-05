@@ -9,10 +9,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self):
         # Call the parent class (Sprite) constructor
         super().__init__()
-
-        self.image = pygame.Surface([4, 10])
-        self.image.fill(RED)
-
+        self.image = pygame.image.load("Images/Lasers/laserGreen10.png")
         self.rect = self.image.get_rect()
 
     def update(self):
