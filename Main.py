@@ -12,6 +12,7 @@ pygame.display.set_caption("Meteor Hunt")
 click_do_mouse = pygame.mixer.Sound("./Sounds/laser5.ogg")
 background_position = [0, -2000]
 background_image = pygame.image.load("./Images/Background/Stars (Blue).png").convert()
+loop_game = 0
 
 player = player.Player()
 
@@ -31,19 +32,6 @@ all_sprites_list.add(player)
 
 done = False
 
-block = meteor.Meteor(Constants.BROWN, 20, 15)
-
-for i in range(50):
-    block = meteor.Meteor(Constants.BROWN, 20, 15)
-
-    # Set a random location for the meteor
-    block.rect.x = random.randrange(Constants.SCREEN_WIDTH)
-    block.rect.y = random.randrange(Constants.SCREEN_HEIGHT)
-
-    # all_sprites_list.add(meteor)
-    # Add the meteor to the list of objects
-    meteor_list.add(block)
-
 while not done:
     pos = pygame.mouse.get_pos()
 
@@ -61,6 +49,12 @@ while not done:
             all_sprites_list.add(shot)
             bullet_list.add(shot)
 
+    # Summon meteors
+    if loop_game % Constants.ASTEROID_SUMMON_TIME == 0:
+        asteroid = meteor.Meteor(Constants.BROWN, 20, 15)
+        asteroid.reposicionar(Constants.SCREEN_WIDTH)
+        meteor_list.add(asteroid)
+    loop_game += 1
     # --- Game Logic
     #Call update method on all the sprites
     all_sprites_list.update()
@@ -75,10 +69,16 @@ while not done:
         meteors_hit_list = pygame.sprite.spritecollide(shot, meteor_list, True)
 
         # Check the list of collisions.
-        for meteor in meteors_hit_list:
-            meteor_list.remove(block)
+        for asteroid in meteors_hit_list:
+            meteor_list.remove(asteroid)
             bullet_list.remove(shot)
+            all_sprites_list.remove(shot)
 
+    #Remove player if it's hited
+    player_hit_list = pygame.sprite.spritecollide(player, meteor_list, True)
+
+    if player_hit_list:
+        all_sprites_list.remove(player)
 
     Constants.screen.blit(background_image, background_position)
     Constants.screen.blit(player.image, pos)
@@ -90,7 +90,8 @@ while not done:
         background_position[1] += 2
 
     # Draw all the sprites
-    bullet_list.draw(Constants.screen)
+    all_sprites_list.draw(Constants.screen)
+    #bullet_list.draw(Constants.screen)
     meteor_list.draw(Constants.screen)
 
     pygame.display.flip()
