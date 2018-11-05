@@ -1,9 +1,8 @@
 import pygame
 
 # Dimensões da tela
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode([0, 0], pygame.FULLSCREEN)
+X, Y = screen.get_size();
 
 # Cores
 BLACK = (0, 0, 0)

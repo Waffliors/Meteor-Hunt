@@ -1,5 +1,6 @@
 import pygame
 import random
+import Constants
 
 class Meteor(pygame.sprite.Sprite):
 
@@ -12,9 +13,7 @@ class Meteor(pygame.sprite.Sprite):
 
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
-        self.asteroid_image = pygame.image.load("Images/Asteroid/Asteroid 01.png")
-        self.image = pygame.Surface([width, height])
-        self.image.fill(color)
+        self.image = pygame.image.load("Images/Meteors/meteorBrown_big1.png")#pygame.Surface([width, height])
         self.loop_asteroid = 0
 
         # Fetch the rectangle object that has the dimensions of the image
@@ -27,7 +26,7 @@ class Meteor(pygame.sprite.Sprite):
         self.rect.y = random.randrange(-100, -10)
         self.rect.x = random.randrange(0, screen_width)
 
-    def update(self, screen_width,screen_height):
+    def update(self, screen_width, screen_height):
         self.rect.y += 1
 
         if self.rect.y > screen_height:

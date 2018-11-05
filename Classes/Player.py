@@ -10,7 +10,7 @@ class Player(pygame.sprite.Sprite):
         # Call the parent class (Sprite) constructor
         super().__init__()
 
-        self.image = pygame.image.load("./Images/space_ship.png").convert()
+        self.image = pygame.image.load("./Images/Spaceship/playerShip1_green.png").convert()
         self.image.set_colorkey(BLACK)
 
         self.rect = self.image.get_rect()
