@@ -14,6 +14,7 @@ background_position = [0, -1200]
 background_image = pygame.image.load("Images/Background/darkPurple.png").convert()
 loop_game = 0
 pygame.mouse.set_visible(False)
+score = 0
 
 player = player.Player()
 
@@ -53,6 +54,13 @@ while not done:
             all_sprites_list.add(shot)
             bullet_list.add(shot)
 
+    if score == 10:
+        Constants.ASTEROID_MOVE_SPEED = 5
+        Constants.ASTEROID_SUMMON_TIME = 60
+    elif score == 20:
+        Constants.ASTEROID_MOVE_SPEED = 10
+        Constants.ASTEROID_SUMMON_TIME = 30
+
     # Summon meteors
     if loop_game % Constants.ASTEROID_SUMMON_TIME == 0:
         asteroid = meteor.Meteor()
@@ -61,13 +69,14 @@ while not done:
     loop_game += 1
 
     # --- Game Logic
+
     #Call update method on all the sprites
     all_sprites_list.update()
-    meteor_list.update(Constants.X, Constants.Y)
+    meteor_list.update(Constants.X, Constants.Y, Constants.ASTEROID_MOVE_SPEED)
     bullet_list.update()
     # Calculate mechanics for each bullet
     for shot in bullet_list:
-        #Remove the bullet if it fliees up off the screen
+        #Remove the bullet if it flies up off the screen
         if shot.rect.y < -40:
             bullet_list.remove(shot)
             all_sprites_list.remove(shot)
@@ -76,11 +85,13 @@ while not done:
 
         # Check the list of collisions.
         for asteroid in meteors_hit_list:
+            score = score + 1
+            print(score)
             meteor_list.remove(asteroid)
             bullet_list.remove(shot)
             all_sprites_list.remove(shot)
 
-    #Remove player if it's hited
+    #Remove player if it's hit
     player_hit_list = pygame.sprite.spritecollide(player, meteor_list, True)
 
     if player_hit_list:
