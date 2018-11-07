@@ -10,11 +10,12 @@ pygame.init()
 clock = pygame.time.Clock()
 pygame.display.set_caption("Meteor Hunt")
 click_do_mouse = pygame.mixer.Sound("./Sounds/laser5.ogg")
-background_position = [0, -1200]
-background_image = pygame.image.load("Images/Background/darkPurple.png").convert()
+background_position = [0, -1280]
+background_image = pygame.image.load("Images/Background/full.png").convert()
 loop_game = 0
 pygame.mouse.set_visible(False)
 score = 0
+font = pygame.font.Font("./Fonts/kenvector_future_thin.ttf", 36)
 
 player = player.Player()
 
@@ -54,12 +55,20 @@ while not done:
             all_sprites_list.add(shot)
             bullet_list.add(shot)
 
-    if score == 10:
-        Constants.ASTEROID_MOVE_SPEED = 5
+    texto = font.render("SCORE: " + str(score), True, Constants.WHITE)
+
+    if score >= 20 and Constants.ASTEROID_MOVE_SPEED == 1:
+        background_position[1] = -3840
+        Constants.ASTEROID_MOVE_SPEED = 3
         Constants.ASTEROID_SUMMON_TIME = 60
-    elif score == 20:
-        Constants.ASTEROID_MOVE_SPEED = 10
+    elif score >= 50 and Constants.ASTEROID_MOVE_SPEED == 3:
+        background_position[1] = -6400
+        Constants.ASTEROID_MOVE_SPEED = 5
         Constants.ASTEROID_SUMMON_TIME = 30
+    elif score >= 100 and Constants.ASTEROID_MOVE_SPEED == 5:
+        background_position[1] = -8960
+        Constants.ASTEROID_MOVE_SPEED = 10
+        Constants.ASTEROID_SUMMON_TIME = 20
 
     # Summon meteors
     if loop_game % Constants.ASTEROID_SUMMON_TIME == 0:
@@ -85,7 +94,7 @@ while not done:
 
         # Check the list of collisions.
         for asteroid in meteors_hit_list:
-            score = score + 1
+            score = score + asteroid.value
             print(score)
             meteor_list.remove(asteroid)
             bullet_list.remove(shot)
@@ -102,15 +111,32 @@ while not done:
     Constants.screen.blit(background_image, background_position)
 
     # Roll the background
-    if background_position[1] >= 0:
-        background_position[1] = -1200
-    else:
-        background_position[1] += 2
+    if background_position[1] >= -1280 and background_position[1] <= 0:
+        if background_position[1] >= 0:
+            background_position[1] = -1280
+        else:
+            background_position[1] += 2
+    elif background_position[1] >= -3840 and background_position[1] <= -1281:
+        if background_position[1] >= -1281:
+            background_position[1] = -3840
+        else:
+            background_position[1] += 2
+    elif background_position[1] >= -6400 and background_position[1] <= -3841:
+        if background_position[1] >= -3841:
+            background_position[1] = -6400
+        else:
+            background_position[1] += 2
+    elif background_position[1] >= -8960 and background_position[1] <= -6401:
+        if background_position[1] >= -6401:
+            background_position[1] = -8960
+        else:
+            background_position[1] += 2
 
     # Draw all the sprites
     all_sprites_list.draw(Constants.screen)
     meteor_list.draw(Constants.screen)
     bullet_list.draw(Constants.screen)
+    Constants.screen.blit(texto, [10, 10])
 
     pygame.display.update()
 
