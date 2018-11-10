@@ -149,22 +149,22 @@ while not gameLoop:
             if background_position[1] >= 0:
                 background_position[1] = -1280
             else:
-                background_position[1] += 2
-        elif background_position[1] >= -3840 and background_position[1] <= -1281:
-            if background_position[1] >= -1281:
+                background_position[1] += Constants.BACKGROUND_SPEED
+        elif background_position[1] >= -3840 and background_position[1] <= -2560:
+            if background_position[1] >= -2560:
                 background_position[1] = -3840
             else:
-                background_position[1] += 2
-        elif background_position[1] >= -6400 and background_position[1] <= -3841:
-            if background_position[1] >= -3841:
+                background_position[1] += Constants.BACKGROUND_SPEED
+        elif background_position[1] >= -6400 and background_position[1] <= -5120:
+            if background_position[1] >= -5120:
                 background_position[1] = -6400
             else:
-                background_position[1] += 2
-        elif background_position[1] >= -8960 and background_position[1] <= -6401:
-            if background_position[1] >= -6401:
+                background_position[1] += Constants.BACKGROUND_SPEED
+        elif background_position[1] >= -8960 and background_position[1] <= -7680:
+            if background_position[1] >= -7680:
                 background_position[1] = -8960
             else:
-                background_position[1] += 2
+                background_position[1] += Constants.BACKGROUND_SPEED
 
         # Draw all the sprites
         all_sprites_list.draw(Constants.screen)
