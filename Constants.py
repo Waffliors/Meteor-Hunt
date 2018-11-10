@@ -1,7 +1,7 @@
 import pygame
 
 # Dimensões da tela
-screen = pygame.display.set_mode([0, 0], pygame.FULLSCREEN)
+screen = pygame.display.set_mode([0,0], pygame.FULLSCREEN)
 X, Y = screen.get_size()
 
 # Cores
