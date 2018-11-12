@@ -23,6 +23,12 @@ pygame.mouse.set_visible(False)
 score = 0
 font = pygame.font.Font("./Fonts/kenvector_future_thin.ttf", 36)
 textinput = textInput.TextInput()
+cursor_porcent_Y = 75
+cursor_porcent_X = 50
+cursor_loop = 0
+cursor_side = "L"
+title_image = ""
+image = ""
 
 player = player.Player()
 
@@ -41,7 +47,7 @@ meteors_hit_list = pygame.sprite.Group()
 all_sprites_list.add(player)
 
 gameLoop = False
-gameState = 1
+gameState = 0
 while not gameLoop:
 
     for event in pygame.event.get():
@@ -50,6 +56,96 @@ while not gameLoop:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 gameLoop = True
+            elif event.key == pygame.K_RETURN and gameState == 0 and cursor_Y == Constants.Y / 100 * 75:
+                gameState = 1
+            elif event.key == pygame.K_RETURN and gameState == 0 and cursor_Y == Constants.Y / 100 * 90:
+                gameState = -5
+                gameLoop = True
+            elif gameState == 0 and event.key == pygame.K_DOWN:
+                Constants.screen.blit(background_image, background_position)
+                cursor_loop = 0
+                if cursor_Y >= Constants.Y / 100 * 75 and  cursor_Y < Constants.Y / 100 * 90:
+                    cursor_porcent_Y += 5
+                    if cursor_porcent_Y == 75:
+                        cursor_porcent_X = 50
+                    elif cursor_porcent_Y == 80:
+                        cursor_porcent_X = 50
+                    elif cursor_porcent_Y == 85:
+                        cursor_porcent_X = 100
+                    elif cursor_porcent_Y == 90:
+                        cursor_porcent_X = 130
+            elif gameState == 0 and event.key == pygame.K_UP:
+                cursor_loop = 0
+                Constants.screen.blit(background_image, background_position)
+                if cursor_Y > Constants.Y / 100 * 75 and cursor_Y <= Constants.Y / 100 * 90:
+                    cursor_porcent_Y -= 5
+                    if cursor_porcent_Y == 75:
+                        cursor_porcent_X = 50
+                    elif cursor_porcent_Y == 80:
+                        cursor_porcent_X = 50
+                    elif cursor_porcent_Y == 85:
+                        cursor_porcent_X = 100
+                    elif cursor_porcent_Y == 90:
+                        cursor_porcent_X = 130
+
+    # Menu
+    if gameState == 0:
+        # Background Image
+        if image != "Images/Background/lightBlue.png":
+            image = "Images/Background/lightBlue.png"
+            background_image = pygame.image.load(image)
+        Constants.screen.blit(background_image, background_position)
+
+        # Title Image
+        if Constants.X >= 800 and Constants.X < 1200 and title_image == "":
+            title_image = "Images/UI/Title-(800_600).png"
+            title = pygame.image.load(title_image)
+        elif Constants.X >= 1200 and Constants.X < 1600 and title_image == "":
+            title_image = "Images/UI/Title-(1200_900).png"
+            title = pygame.image.load(title_image)
+        elif Constants.X >= 1600 and title_image == "":
+            title_image = "Images/UI/Title-(1650_1080).png"
+            title = pygame.image.load(title_image)
+        Constants.screen.blit(title, (0, 0))
+
+        # Menu Texts
+        menu_start = font.render("Iníciar Jogo", True, Constants.BLACK)
+        Constants.screen.blit(menu_start, (Constants.X / 2 - menu_start.get_rect().size[0] / 2, Constants.Y / 100 * 75))
+        menu_ranking = font.render("Pontuações", True, Constants.BLACK)
+        Constants.screen.blit(menu_ranking,
+                              (Constants.X / 2 - menu_ranking.get_rect().size[0] / 2, Constants.Y / 100 * 80))
+        menu_option = font.render("Opções", True, Constants.BLACK)
+        Constants.screen.blit(menu_option,
+                              (Constants.X / 2 - menu_option.get_rect().size[0] / 2, Constants.Y / 100 * 85))
+        menu_exit = font.render("Sair", True, Constants.BLACK)
+        Constants.screen.blit(menu_exit, (Constants.X / 2 - menu_exit.get_rect().size[0] / 2, Constants.Y / 100 * 90))
+
+        # Menu Cursor
+        if cursor_porcent_Y == 90:
+            cursor = "Images/Spaceship/playerShip2_red.png"
+        else:
+            cursor = "Images/Spaceship/playerShip2_blue.png"
+
+        cursor_X = Constants.X / 2 - menu_start.get_rect().size[0] + cursor_porcent_X
+        cursor_Y = Constants.Y / 100 * cursor_porcent_Y
+        cursor_image = pygame.image.load(cursor).convert()
+        cursor_image.set_colorkey(Constants.BLACK)
+        cursor_image = pygame.transform.scale(cursor_image, (44, 32))
+        cursor_image = pygame.transform.rotate(cursor_image, -90)
+        Constants.screen.blit(cursor_image, (cursor_X, cursor_Y))
+
+        if cursor_side == "R" and cursor_loop <= 7:
+            cursor_porcent_X -= 1
+            if cursor_loop == 7:
+                cursor_side = "L"
+                cursor_loop = 0
+        elif cursor_side == "L" and cursor_loop <= 7:
+            cursor_porcent_X += 1
+            if cursor_loop == 7:
+                cursor_side = "R"
+                cursor_loop = 0
+        cursor_loop += 1
+
     # Game Over
     if gameState == -1:
         Constants.screen.fill(Constants.BLACK)
@@ -67,7 +163,7 @@ while not gameLoop:
         pygame.display.update()
 
     # Game Running
-    if gameState == 1:
+    while gameState == 1:
         pos = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
