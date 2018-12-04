@@ -1,26 +1,67 @@
 import pygame
+import pickle
 import Constants
 import Classes.Bullet as bullet
 import Classes.Damage as damage
 import Classes.Player as player
 import Classes.Meteors as meteor
 import Classes.TextInput as textInput
-import Classes.Score as score
+import Score as Score
 
-# gameState = -1 = game over/ inserção de rank
+# gameState = -1 = game over
 # gameState = 0 = menu principal
 # gameState = 1 = jogo rodando
-# gameState = 2 = pause
-
+# gameState = 2 = option
+# gameState = 3 = pontuações
+# gameState = 4 = deleta pontuações
 
 pygame.init()
+
+chamaMetodoDoScore = Score.Ranking(" ", 0)
+# Traz a lista de scores salvos pro main
+listaDeRankings = pickle.load(open('save.pkl', 'rb'))
 
 clock = pygame.time.Clock()
 pygame.display.set_caption("Meteor Hunt")
 click_do_mouse = pygame.mixer.Sound("./Sounds/sfx_laser2.ogg")
+pygame.mixer.music.load("./Musics/Fundo.ogg")
+pygame.mixer.music.play(-1)
+option_volume = 5
+option_volume_number = 50
+slide_volume = 0
+volume_green_slide = 505
+volume_white_slide = 0
+volume_green_size = 230
+volume_white_size = 250
 background_position = [0, -1280]
 loop_game = 0
 image = ""
+tempo = 0
+
+#Sound
+sound_image = "Images/UI/Active.png"
+active_sound_image = pygame.image.load(sound_image)
+
+volume_active = "on"
+volume_porcent = 5
+volume_image_button = "Images/UI/Volume_" + volume_active + "_" + str(volume_porcent) + ".png"
+volume_image_button_image = pygame.image.load(volume_image_button)
+
+
+meteorExplosionSound = pygame.mixer.Sound("Sounds/MeteorExplosion.wav")
+meteorExplosionSound.set_volume(0.2)
+playerExplosionSound = pygame.mixer.Sound("Sounds/PlayerExplosion.wav")
+playerExplosionSound.set_volume(1.0)
+playerHitSound = pygame.mixer.Sound("Sounds/PlayerHit.wav")
+playerHitSound.set_volume(1.0)
+optionSelectionSound = pygame.mixer.Sound("Sounds/OptionSelection.wav")
+optionSelectionSound.set_volume(1.0)
+musica = "Musics/MenuMusic.ogg"
+pygame.mixer.music.load(musica)
+pygame.mixer.music.play(-1)
+musicaLigada = True
+#Sound
+
 title_image = ""
 pygame.mouse.set_visible(False)
 score = 0
@@ -58,21 +99,57 @@ while not gameLoop:
     if pause == False:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                gameState = -5
                 gameLoop = True
             elif event.type == pygame.KEYDOWN:
                 if gameState == 1 and (event.key == pygame.K_p or event.key == pygame.K_ESCAPE):
+                    optionSelectionSound.play()
                     pause = True
                 elif gameState != 1 and event.key == pygame.K_ESCAPE:
+                    optionSelectionSound.play()
                     gameState = -5
                     gameLoop = True
                 elif event.key == pygame.K_RETURN and gameState == 0 and cursor_Y == Constants.Y / 100 * 75:
+                    optionSelectionSound.play()
                     gameState = 1
+                elif event.key == pygame.K_RETURN and gameState == 0 and cursor_Y == Constants.Y / 100 * 85:
+                    optionSelectionSound.play()
+                    gameState = 2
+                    cursor_porcent_Y = 40
+                    cursor_porcent_X = -425
+                elif event.key == pygame.K_RETURN and gameState == 0 and cursor_Y == Constants.Y / 100 * 80:
+                    optionSelectionSound.play()
+                    gameState = 3
+                    cursor_porcent_Y = 90
+                    cursor_porcent_X = 0
                 elif event.key == pygame.K_RETURN and gameState == 0 and cursor_Y == Constants.Y / 100 * 90:
-                    gameState = -5
+                    optionSelectionSound.play()
                     gameLoop = True
+                elif event.key == pygame.K_RETURN and gameState == 2 and cursor_Y == Constants.Y / 100 * 90:
+                    optionSelectionSound.play()
+                    gameState = 0
+                    cursor_porcent_X = 130
+                elif event.key == pygame.K_RETURN and gameState == 3 and cursor_Y == Constants.Y / 100 * 90:
+                    optionSelectionSound.play()
+                    gameState = 0
+                    cursor_porcent_X = 130
+                elif event.key == pygame.K_RETURN and gameState == 3 and cursor_Y == Constants.Y / 100 * 80:
+                    optionSelectionSound.play()
+                    gameState = 4
+                    cursor_porcent_Y = 65
+                    cursor_porcent_X = 50
+                elif event.key == pygame.K_RETURN and gameState == 4 and cursor_Y == Constants.Y / 100 * 55:
+                    optionSelectionSound.play()
+                    listaDeRankings = chamaMetodoDoScore.resetSave(listaDeRankings)
+                    gameState = 3
+                    cursor_porcent_Y = 90
+                    cursor_porcent_X = 0
+                elif event.key == pygame.K_RETURN and gameState == 4 and cursor_Y == Constants.Y / 100 * 65:
+                    optionSelectionSound.play()
+                    gameState = 3
+                    cursor_porcent_Y = 90
+                    cursor_porcent_X = 0
                 elif gameState == 0 and event.key == pygame.K_DOWN:
-                    Constants.screen.blit(background_image, background_position)
+                    optionSelectionSound.play()
                     cursor_loop = 0
                     if cursor_Y >= Constants.Y / 100 * 75 and  cursor_Y < Constants.Y / 100 * 90:
                         cursor_porcent_Y += 5
@@ -85,8 +162,8 @@ while not gameLoop:
                         elif cursor_porcent_Y == 90:
                             cursor_porcent_X = 130
                 elif gameState == 0 and event.key == pygame.K_UP:
+                    optionSelectionSound.play()
                     cursor_loop = 0
-                    Constants.screen.blit(background_image, background_position)
                     if cursor_Y > Constants.Y / 100 * 75 and  cursor_Y <= Constants.Y / 100 * 90:
                         cursor_porcent_Y -= 5
                         if cursor_porcent_Y == 75:
@@ -97,6 +174,289 @@ while not gameLoop:
                             cursor_porcent_X = 100
                         elif cursor_porcent_Y == 90:
                             cursor_porcent_X = 130
+                elif gameState == 2 and event.key == pygame.K_DOWN:
+                    optionSelectionSound.play()
+                    cursor_loop = 0
+                    if cursor_porcent_Y == 60:
+                        cursor_porcent_Y = 90
+                        cursor_porcent_X = 0
+                    if cursor_porcent_Y == 40:
+                        cursor_porcent_Y = 60
+                        cursor_porcent_X = -425
+                elif gameState == 2 and event.key == pygame.K_UP:
+                    optionSelectionSound.play()
+                    cursor_loop = 0
+                    if cursor_porcent_Y == 60:
+                        cursor_porcent_Y = 40
+                        cursor_porcent_X = -425
+                    if cursor_porcent_Y == 90:
+                        cursor_porcent_Y = 60
+                        cursor_porcent_X = -425
+                elif gameState == 3 and event.key == pygame.K_DOWN:
+                    optionSelectionSound.play()
+                    cursor_loop = 0
+                    if cursor_porcent_Y == 80:
+                        cursor_porcent_Y = 90
+                        cursor_porcent_X = 0
+                elif gameState == 3 and event.key == pygame.K_UP:
+                    optionSelectionSound.play()
+                    cursor_loop = 0
+                    if cursor_porcent_Y == 90:
+                        cursor_porcent_Y = 80
+                        cursor_porcent_X = -130
+                elif gameState == 4 and event.key == pygame.K_DOWN:
+                    optionSelectionSound.play()
+                    cursor_loop = 0
+                    if cursor_porcent_Y == 55:
+                        cursor_porcent_Y = 65
+                        cursor_porcent_X = 50
+                elif gameState == 4 and event.key == pygame.K_UP:
+                    optionSelectionSound.play()
+                    cursor_loop = 0
+                    if cursor_porcent_Y == 65:
+                        cursor_porcent_Y = 55
+                        cursor_porcent_X = 50
+                elif event.key == pygame.K_LEFT and gameState == 2 and cursor_porcent_Y == 40:
+                    optionSelectionSound.play()
+                    # Sound Image
+                    sound_image = "Images/UI/Deactive.png"
+                    volume_active = "off"
+                    active_sound_image = pygame.image.load(sound_image)
+                    volume_image_button = "Images/UI/Volume_" + volume_active + "_" + str(volume_porcent) + ".png"
+                    volume_image_button_image = pygame.image.load(volume_image_button)
+                    pygame.mixer.music.set_volume(0.0)
+                    musicaLigada = False
+                    click_do_mouse.set_volume(0.0)
+                    meteorExplosionSound.set_volume(0.0)
+                    playerHitSound.set_volume(0.0)
+                    playerExplosionSound.set_volume(0.0)
+                    optionSelectionSound.set_volume(0.0)
+                elif event.key == pygame.K_RIGHT and gameState == 2 and cursor_porcent_Y == 40:
+                    optionSelectionSound.play()
+                    # Sound Image
+                    sound_image = "Images/UI/Active.png"
+                    volume_active = "on"
+                    active_sound_image = pygame.image.load(sound_image)
+                    volume_image_button = "Images/UI/Volume_" + volume_active + "_" + str(volume_porcent) + ".png"
+                    volume_image_button_image = pygame.image.load(volume_image_button)
+                    pygame.mixer.music.set_volume(1.0)
+                    musicaLigada = True
+                    click_do_mouse.set_volume(1.0)
+                    meteorExplosionSound.set_volume(0.5)
+                    playerHitSound.set_volume(1.0)
+                    playerExplosionSound.set_volume(1.0)
+                    optionSelectionSound.set_volume(1.0)
+                elif event.key == pygame.K_LEFT and gameState == 2 and cursor_porcent_Y == 60 and sound_image == "Images/UI/Active.png":
+                    if volume_porcent > 0:
+                        volume_porcent -= 1
+                        volume_image_button = "Images/UI/Volume_" + volume_active + "_" + str(volume_porcent) + ".png"
+                        volume_image_button_image = pygame.image.load(volume_image_button)
+                    if option_volume == 1:
+                        option_volume = 0
+                        pygame.mixer.music.set_volume(0.0)
+                        option_volume_number = 0
+                        click_do_mouse.set_volume(0.0)
+                        meteorExplosionSound.set_volume(0.0)
+                        playerHitSound.set_volume(0.0)
+                        playerExplosionSound.set_volume(0.0)
+                        optionSelectionSound.set_volume(0.0)
+                        optionSelectionSound.play()
+                    elif option_volume == 2:
+                        option_volume = 1
+                        pygame.mixer.music.set_volume(0.1)
+                        option_volume_number = 10
+                        click_do_mouse.set_volume(0.1)
+                        meteorExplosionSound.set_volume(0.1)
+                        playerHitSound.set_volume(0.1)
+                        playerExplosionSound.set_volume(0.1)
+                        optionSelectionSound.set_volume(0.1)
+                        optionSelectionSound.play()
+                    elif option_volume == 3:
+                        option_volume = 2
+                        pygame.mixer.music.set_volume(0.2)
+                        click_do_mouse.set_volume(0.2)
+                        meteorExplosionSound.set_volume(0.2)
+                        playerHitSound.set_volume(0.2)
+                        playerExplosionSound.set_volume(0.2)
+                        optionSelectionSound.set_volume(0.2)
+                        optionSelectionSound.play()
+                        option_volume_number = 20
+                    elif option_volume == 4:
+                        option_volume = 3
+                        pygame.mixer.music.set_volume(0.3)
+                        click_do_mouse.set_volume(0.3)
+                        meteorExplosionSound.set_volume(0.3)
+                        playerHitSound.set_volume(0.3)
+                        playerExplosionSound.set_volume(0.3)
+                        optionSelectionSound.set_volume(0.3)
+                        optionSelectionSound.play()
+                        option_volume_number = 30
+                    elif option_volume == 5:
+                        option_volume = 4
+                        pygame.mixer.music.set_volume(0.4)
+                        option_volume_number = 40
+                        click_do_mouse.set_volume(0.4)
+                        meteorExplosionSound.set_volume(0.4)
+                        playerHitSound.set_volume(0.4)
+                        playerExplosionSound.set_volume(0.4)
+                        optionSelectionSound.set_volume(0.4)
+                        optionSelectionSound.play()
+                    elif option_volume == 6:
+                        option_volume = 5
+                        pygame.mixer.music.set_volume(0.5)
+                        option_volume_number = 50
+                        click_do_mouse.set_volume(0.5)
+                        meteorExplosionSound.set_volume(0.5)
+                        playerHitSound.set_volume(0.5)
+                        playerExplosionSound.set_volume(0.5)
+                        optionSelectionSound.set_volume(0.5)
+                        optionSelectionSound.play()
+                    elif option_volume == 7:
+                        option_volume = 6
+                        pygame.mixer.music.set_volume(0.6)
+                        option_volume_number = 60
+                        click_do_mouse.set_volume(0.6)
+                        meteorExplosionSound.set_volume(0.6)
+                        playerHitSound.set_volume(0.6)
+                        playerExplosionSound.set_volume(0.6)
+                        optionSelectionSound.set_volume(0.6)
+                        optionSelectionSound.play()
+                    elif option_volume == 8:
+                        option_volume = 7
+                        pygame.mixer.music.set_volume(0.7)
+                        option_volume_number = 70
+                        click_do_mouse.set_volume(0.7)
+                        meteorExplosionSound.set_volume(0.7)
+                        playerHitSound.set_volume(0.7)
+                        playerExplosionSound.set_volume(0.7)
+                        optionSelectionSound.set_volume(0.7)
+                        optionSelectionSound.play()
+                    elif option_volume == 9:
+                        option_volume = 8
+                        pygame.mixer.music.set_volume(0.8)
+                        option_volume_number = 80
+                        click_do_mouse.set_volume(0.8)
+                        meteorExplosionSound.set_volume(0.8)
+                        playerHitSound.set_volume(0.8)
+                        playerExplosionSound.set_volume(0.8)
+                        optionSelectionSound.set_volume(0.8)
+                        optionSelectionSound.play()
+                    elif option_volume == 10:
+                        option_volume = 9
+                        pygame.mixer.music.set_volume(0.9)
+                        option_volume_number = 90
+                        click_do_mouse.set_volume(0.9)
+                        meteorExplosionSound.set_volume(0.9)
+                        playerHitSound.set_volume(0.9)
+                        playerExplosionSound.set_volume(0.9)
+                        optionSelectionSound.set_volume(0.9)
+                        optionSelectionSound.play()
+                elif event.key == pygame.K_RIGHT and gameState == 2 and cursor_porcent_Y == 60 and sound_image == "Images/UI/Active.png":
+                    if volume_porcent < 10:
+                        volume_porcent += 1
+                        volume_image_button = "Images/UI/Volume_" + volume_active + "_" + str(volume_porcent) + ".png"
+                        volume_image_button_image = pygame.image.load(volume_image_button)
+                    if option_volume == 9:
+                        option_volume = 10
+                        pygame.mixer.music.set_volume(1.0)
+                        option_volume_number = 100
+                        click_do_mouse.set_volume(1.0)
+                        meteorExplosionSound.set_volume(1.0)
+                        playerHitSound.set_volume(1.0)
+                        playerExplosionSound.set_volume(1.0)
+                        optionSelectionSound.set_volume(1.0)
+                        optionSelectionSound.play()
+                    elif option_volume == 8:
+                        option_volume = 9
+                        pygame.mixer.music.set_volume(0.9)
+                        option_volume_number = 90
+                        click_do_mouse.set_volume(0.9)
+                        meteorExplosionSound.set_volume(0.9)
+                        playerHitSound.set_volume(0.9)
+                        playerExplosionSound.set_volume(0.9)
+                        optionSelectionSound.set_volume(0.9)
+                        optionSelectionSound.play()
+                    elif option_volume == 7:
+                        option_volume = 8
+                        pygame.mixer.music.set_volume(0.8)
+                        option_volume_number = 80
+                        click_do_mouse.set_volume(0.8)
+                        meteorExplosionSound.set_volume(0.8)
+                        playerHitSound.set_volume(0.8)
+                        playerExplosionSound.set_volume(0.8)
+                        optionSelectionSound.set_volume(0.8)
+                        optionSelectionSound.play()
+                    elif option_volume == 6:
+                        option_volume = 7
+                        pygame.mixer.music.set_volume(0.7)
+                        option_volume_number = 70
+                        click_do_mouse.set_volume(0.7)
+                        meteorExplosionSound.set_volume(0.7)
+                        playerHitSound.set_volume(0.7)
+                        playerExplosionSound.set_volume(0.7)
+                        optionSelectionSound.set_volume(0.7)
+                        optionSelectionSound.play()
+                    elif option_volume == 5:
+                        option_volume = 6
+                        pygame.mixer.music.set_volume(0.6)
+                        option_volume_number = 60
+                        click_do_mouse.set_volume(0.6)
+                        meteorExplosionSound.set_volume(0.6)
+                        playerHitSound.set_volume(0.6)
+                        playerExplosionSound.set_volume(0.6)
+                        optionSelectionSound.set_volume(0.6)
+                        optionSelectionSound.play()
+                    elif option_volume == 4:
+                        option_volume = 5
+                        pygame.mixer.music.set_volume(0.5)
+                        option_volume_number = 50
+                        click_do_mouse.set_volume(0.5)
+                        meteorExplosionSound.set_volume(0.5)
+                        playerHitSound.set_volume(0.5)
+                        playerExplosionSound.set_volume(0.5)
+                        optionSelectionSound.set_volume(0.5)
+                        optionSelectionSound.play()
+                    elif option_volume == 3:
+                        option_volume = 4
+                        pygame.mixer.music.set_volume(0.4)
+                        option_volume_number = 40
+                        click_do_mouse.set_volume(0.4)
+                        meteorExplosionSound.set_volume(0.4)
+                        playerHitSound.set_volume(0.4)
+                        playerExplosionSound.set_volume(0.4)
+                        optionSelectionSound.set_volume(0.4)
+                        optionSelectionSound.play()
+                    elif option_volume == 2:
+                        option_volume = 3
+                        pygame.mixer.music.set_volume(0.3)
+                        option_volume_number = 30
+                        click_do_mouse.set_volume(0.3)
+                        meteorExplosionSound.set_volume(0.3)
+                        playerHitSound.set_volume(0.3)
+                        playerExplosionSound.set_volume(0.3)
+                        optionSelectionSound.set_volume(0.3)
+                        optionSelectionSound.play()
+                    elif option_volume == 1:
+                        option_volume = 2
+                        pygame.mixer.music.set_volume(0.2)
+                        option_volume_number = 20
+                        click_do_mouse.set_volume(0.2)
+                        meteorExplosionSound.set_volume(0.2)
+                        playerHitSound.set_volume(0.2)
+                        playerExplosionSound.set_volume(0.2)
+                        optionSelectionSound.set_volume(0.2)
+                        optionSelectionSound.play()
+                    elif option_volume == 0:
+                        option_volume = 1
+                        pygame.mixer.music.set_volume(0.1)
+                        option_volume_number = 10
+                        click_do_mouse.set_volume(0.1)
+                        meteorExplosionSound.set_volume(0.1)
+                        playerHitSound.set_volume(0.1)
+                        playerExplosionSound.set_volume(0.1)
+                        optionSelectionSound.set_volume(0.1)
+                        optionSelectionSound.play()
+
 
             if event.type == pygame.MOUSEBUTTONDOWN and gameState == 1:
                 bulletDelay = True
@@ -108,6 +468,10 @@ while not gameLoop:
 
         # Game Over
         if gameState == -1:
+            if musica != "Musics/ScoreMusic.ogg" and musicaLigada == True:
+                musica = "Musics/ScoreMusic.ogg"
+                pygame.mixer.music.load(musica)
+                pygame.mixer.music.play(-1)
             #Background Image
             if image != "Images/Background/lightBlue.png":
                 image = "Images/Background/lightBlue.png"
@@ -115,10 +479,17 @@ while not gameLoop:
                 enterScore = False
             while not enterScore:
                 if (pygame.key.get_pressed()[pygame.K_ESCAPE]):
+                    optionSelectionSound.play
                     gameState = -5
                     gameLoop = True
                     enterScore = True
                 elif (pygame.key.get_pressed()[pygame.K_RETURN]):
+
+                    optionSelectionSound.play
+                    rank = Score.Ranking(textinput.get_text(), score)
+                    rank.poeNaLista(listaDeRankings)
+                    listaDeRankings = chamaMetodoDoScore.arrumaLista(listaDeRankings)
+
                     gameState = 0
                     score = 0
                     enterScore = True
@@ -130,7 +501,7 @@ while not gameLoop:
                     damage.damageSprite = 0
 
                 Constants.screen.blit(background_image, [0, 0])
-                texto1 = font.render("Fim de jogo! Seu score final foi: " + str(score), True, Constants.WHITE)
+                texto1 = font.render("Fim de jogo! Sua pontuação final foi: " + str(score), True, Constants.WHITE)
                 Constants.screen.blit(texto1, [Constants.X / 2 - texto1.get_rect().size[0] / 2, Constants.Y/3])
                 texto2 = font.render("Insira seu nome!", True, Constants.WHITE)
                 Constants.screen.blit(texto2, [Constants.X / 2 - texto2.get_rect().size[0] / 2, Constants.Y/2])
@@ -145,6 +516,10 @@ while not gameLoop:
 
         # Menu
         if gameState == 0:
+            if musica != "Musics/MenuMusic.ogg" and musicaLigada == True:
+                musica = "Musics/MenuMusic.ogg"
+                pygame.mixer.music.load(musica)
+                pygame.mixer.music.play(-1)
             #Background Image
             if image != "Images/Background/lightBlue.png":
                 image = "Images/Background/lightBlue.png"
@@ -167,7 +542,7 @@ while not gameLoop:
             Constants.screen.blit(title, (0, 0))
 
             # Menu Texts
-            menu_start = font.render("Iníciar Jogo", True, Constants.BLACK)
+            menu_start = font.render("Iniciar Jogo", True, Constants.BLACK)
             Constants.screen.blit(menu_start, (Constants.X / 2 - menu_start.get_rect().size[0] / 2, Constants.Y / 100 * 75))
             menu_ranking = font.render("Pontuações", True, Constants.BLACK)
             Constants.screen.blit(menu_ranking, (Constants.X / 2 - menu_ranking.get_rect().size[0] / 2, Constants.Y / 100 * 80))
@@ -180,7 +555,7 @@ while not gameLoop:
             if cursor_porcent_Y == 90:
                 cursor = "Images/Spaceship/playerShip2_red.png"
             else:
-                cursor = "Images/Spaceship/playerShip2_blue.png"
+                cursor = "Images/Spaceship/playerShip2_green.png"
 
             cursor_X = Constants.X / 2 - menu_start.get_rect().size[0] + cursor_porcent_X
             cursor_Y = Constants.Y / 100 * cursor_porcent_Y
@@ -204,6 +579,10 @@ while not gameLoop:
 
         # Game Running
         if gameState == 1:
+            if musica != "Musics/GameMusic.ogg" and musicaLigada == True:
+                musica = "Musics/GameMusic.ogg"
+                pygame.mixer.music.load(musica)
+                pygame.mixer.music.play(-1)
             if image != "Images/Background/Full_Background.png":
                 image = "Images/Background/Full_Background.png"
                 background_image = pygame.image.load(image).convert()
@@ -230,11 +609,13 @@ while not gameLoop:
             lifeText = font.render("Vidas: " + str(player.life), True, Constants.WHITE)
 
             # Summon meteors
-            if loop_game % Constants.ASTEROID_SUMMON_TIME == 0:
-                asteroid = meteor.Meteor()
-                asteroid.reposicionar(Constants.X)
-                meteor_list.add(asteroid)
-            loop_game += 1
+            if tempo > 200:
+                if loop_game % Constants.ASTEROID_SUMMON_TIME == 0:
+                    asteroid = meteor.Meteor()
+                    asteroid.reposicionar(Constants.X)
+                    meteor_list.add(asteroid)
+                loop_game += 1
+            tempo += 1
 
             # --- Game Logic
 
@@ -257,6 +638,7 @@ while not gameLoop:
                     meteor_list.remove(asteroid)
                     bullet_list.remove(shot)
                     all_sprites_list.remove(shot)
+                    meteorExplosionSound.play()
 
             #Remove player if he was hit
             player_hit_list = pygame.sprite.spritecollide(player, meteor_list, True)
@@ -265,11 +647,13 @@ while not gameLoop:
                 player.life -= 1
                 damage.damageSprite += 1
                 Constants.screen.blit(damage.image, pos)
+                playerHitSound.play()
                 if player.life == 0:
                     Constants.ASTEROID_MOVE_SPEED = 1
                     Constants.ASTEROID_SUMMON_TIME = 60
                     Constants.BACKGROUND_SPEED = 2
                     all_sprites_list.remove(player, damage)
+                    playerExplosionSound.play()
                     for shot in bullet_list:
                         bullet_list.remove(shot)
                         all_sprites_list.remove(shot)
@@ -323,6 +707,163 @@ while not gameLoop:
             bullet_list.draw(Constants.screen)
             Constants.screen.blit(scoreText, [10, 10])
             Constants.screen.blit(lifeText, [Constants.X - 200, 10])
+
+        # Option
+        if gameState == 2:
+            # Background Image
+            if image != "Images/Background/lightBlue.png":
+                image = "Images/Background/lightBlue.png"
+                background_image = pygame.image.load(image)
+            Constants.screen.blit(background_image, [0, 0])
+
+            # Option Texts
+            opcoes = font.render("Opções", True, Constants.WHITE)
+            Constants.screen.blit(opcoes, (Constants.X / 2 - opcoes.get_rect().size[0] / 2, 70))
+            som = font.render("Som:", True, Constants.BLACK)
+            Constants.screen.blit(som, (Constants.X / 2 - 500, Constants.Y / 100 * 40))
+            Constants.screen.blit(active_sound_image, [Constants.X / 2 - 450 + som.get_rect().size[0], Constants.Y / 100 * 39])
+            volume = font.render("Volume:", True, Constants.BLACK)
+            Constants.screen.blit(volume, (Constants.X / 2 - 500, Constants.Y / 100 * 60))
+            Constants.screen.blit(volume_image_button_image, [Constants.X / 2 - 775 + volume_image_button_image.get_rect().size[0], Constants.Y / 100 * 59])
+            volume_number = font.render(str(option_volume_number) + "%", True, Constants.WHITE)
+            Constants.screen.blit(volume_number, (Constants.X / 2 - 250 + volume_image_button_image.get_rect().size[0], Constants.Y / 100 * 60))
+            voltar = font.render("Voltar", True, Constants.BLACK)
+            Constants.screen.blit(voltar, (Constants.X / 2 - voltar.get_rect().size[0] / 2, Constants.Y / 100 * 90))
+
+            cursor_X = Constants.X / 2 - voltar.get_rect().size[0] + cursor_porcent_X
+            cursor_Y = Constants.Y / 100 * cursor_porcent_Y
+            cursor_image = pygame.image.load("Images/Spaceship/playerShip2_green.png").convert()
+            cursor_image.set_colorkey(Constants.BLACK)
+            cursor_image = pygame.transform.scale(cursor_image, (44, 32))
+            cursor_image = pygame.transform.rotate(cursor_image, -90)
+            Constants.screen.blit(cursor_image, (cursor_X, cursor_Y))
+
+            if cursor_side == "R" and cursor_loop <= 7:
+                cursor_porcent_X -= 1
+                if cursor_loop == 7:
+                    cursor_side = "L"
+                    cursor_loop = 0
+            elif cursor_side == "L" and cursor_loop <= 7:
+                cursor_porcent_X += 1
+                if cursor_loop == 7:
+                    cursor_side = "R"
+                    cursor_loop = 0
+            cursor_loop += 1
+
+        # Score
+        if gameState == 3:
+            # Background Image
+            if image != "Images/Background/lightBlue.png":
+                image = "Images/Background/lightBlue.png"
+                background_image = pygame.image.load(image)
+            Constants.screen.blit(background_image, [0, 0])
+
+            # Option Texts
+            opcoes = font.render("Pontuações", True, Constants.WHITE)
+            Constants.screen.blit(opcoes, (Constants.X / 2 - opcoes.get_rect().size[0] / 2, 70))
+
+            score1 = font.render("1.", True, Constants.WHITE)
+            Constants.screen.blit(score1, (Constants.X / 2 - 300, Constants.Y / 100 * 20))
+            score1_nome = font.render(str(listaDeRankings[0]), True, Constants.WHITE)
+            Constants.screen.blit(score1_nome, (Constants.X / 2 - 250, Constants.Y / 100 * 20))
+
+            score2 = font.render("2.", True, Constants.WHITE)
+            Constants.screen.blit(score2, (Constants.X / 2 - 300, Constants.Y / 100 * 30))
+            score2_nome = font.render(str(listaDeRankings[1]), True, Constants.WHITE)
+            Constants.screen.blit(score2_nome, (Constants.X / 2 - 250, Constants.Y / 100 * 30))
+
+            score3 = font.render("3.", True, Constants.WHITE)
+            Constants.screen.blit(score3, (Constants.X / 2 - 300, Constants.Y / 100 * 40))
+            score3_nome = font.render(str(listaDeRankings[2]), True, Constants.WHITE)
+            Constants.screen.blit(score3_nome, (Constants.X / 2 - 250, Constants.Y / 100 * 40))
+
+            score4 = font.render("4.", True, Constants.WHITE)
+            Constants.screen.blit(score4, (Constants.X / 2 - 300, Constants.Y / 100 * 50))
+            score4_nome = font.render(str(listaDeRankings[3]), True, Constants.WHITE)
+            Constants.screen.blit(score4_nome, (Constants.X / 2 - 250, Constants.Y / 100 * 50))
+
+            score5 = font.render("5.", True, Constants.WHITE)
+            Constants.screen.blit(score5, (Constants.X / 2 - 300, Constants.Y / 100 * 60))
+            score5_nome = font.render(str(listaDeRankings[4]), True, Constants.WHITE)
+            Constants.screen.blit(score5_nome, (Constants.X / 2 - 250, Constants.Y / 100 * 60))
+
+            reset = font.render("Resetar Pontuações", True, Constants.BLACK)
+            Constants.screen.blit(reset, (Constants.X / 2 - reset.get_rect().size[0] / 2, Constants.Y / 100 * 80))
+            voltar = font.render("Voltar", True, Constants.BLACK)
+            Constants.screen.blit(voltar, (Constants.X / 2 - voltar.get_rect().size[0] / 2, Constants.Y / 100 * 90))
+
+            # Menu Cursor
+            if cursor_porcent_Y == 80:
+                cursor = "Images/Spaceship/playerShip2_red.png"
+            else:
+                cursor = "Images/Spaceship/playerShip2_green.png"
+
+
+            cursor_X = Constants.X / 2 - voltar.get_rect().size[0] + cursor_porcent_X
+            cursor_Y = Constants.Y / 100 * cursor_porcent_Y
+            cursor_image = pygame.image.load(cursor).convert()
+            cursor_image.set_colorkey(Constants.BLACK)
+            cursor_image = pygame.transform.scale(cursor_image, (44, 32))
+            cursor_image = pygame.transform.rotate(cursor_image, -90)
+            Constants.screen.blit(cursor_image, (cursor_X, cursor_Y))
+
+            if cursor_side == "R" and cursor_loop <= 7:
+                cursor_porcent_X -= 1
+                if cursor_loop == 7:
+                    cursor_side = "L"
+                    cursor_loop = 0
+            elif cursor_side == "L" and cursor_loop <= 7:
+                cursor_porcent_X += 1
+                if cursor_loop == 7:
+                    cursor_side = "R"
+                    cursor_loop = 0
+            cursor_loop += 1
+
+        # Delete Score
+        if gameState == 4:
+            # Background Image
+            if image != "Images/Background/lightBlue.png":
+                image = "Images/Background/lightBlue.png"
+                background_image = pygame.image.load(image)
+            Constants.screen.blit(background_image, [0, 0])
+
+            # Option Texts
+            opcoes = font.render("Pontuações", True, Constants.WHITE)
+            Constants.screen.blit(opcoes, (Constants.X / 2 - opcoes.get_rect().size[0] / 2, 70))
+
+            reset = font.render("Deseja realmente apagar todas as pontuações?", True, Constants.RED)
+            Constants.screen.blit(reset, (Constants.X / 2 - reset.get_rect().size[0] / 2, Constants.Y / 100 * 40))
+            yes = font.render("Sim", True, Constants.BLACK)
+            Constants.screen.blit(yes, (Constants.X / 2 - yes.get_rect().size[0] / 2, Constants.Y / 100 * 55))
+            no = font.render("Não", True, Constants.BLACK)
+            Constants.screen.blit(no, (Constants.X / 2 - no.get_rect().size[0] / 2, Constants.Y / 100 * 65))
+
+            # Menu Cursor
+            if cursor_porcent_Y == 55:
+                cursor = "Images/Spaceship/playerShip2_red.png"
+            else:
+                cursor = "Images/Spaceship/playerShip2_green.png"
+
+
+            cursor_X = Constants.X / 2 - voltar.get_rect().size[0] + cursor_porcent_X
+            cursor_Y = Constants.Y / 100 * cursor_porcent_Y
+            cursor_image = pygame.image.load(cursor).convert()
+            cursor_image.set_colorkey(Constants.BLACK)
+            cursor_image = pygame.transform.scale(cursor_image, (44, 32))
+            cursor_image = pygame.transform.rotate(cursor_image, -90)
+            Constants.screen.blit(cursor_image, (cursor_X, cursor_Y))
+
+            if cursor_side == "R" and cursor_loop <= 7:
+                cursor_porcent_X -= 1
+                if cursor_loop == 7:
+                    cursor_side = "L"
+                    cursor_loop = 0
+            elif cursor_side == "L" and cursor_loop <= 7:
+                cursor_porcent_X += 1
+                if cursor_loop == 7:
+                    cursor_side = "R"
+                    cursor_loop = 0
+            cursor_loop += 1
 
 
     else:
