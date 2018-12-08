@@ -14,6 +14,7 @@ import Score as Score
 # gameState = 2 = option
 # gameState = 3 = pontuações
 # gameState = 4 = deleta pontuações
+# gameState = 5 = seleciona controles
 
 pygame.init()
 
@@ -37,6 +38,8 @@ background_position = [0, -1280]
 loop_game = 0
 image = ""
 tempo = 0
+keyboard_image = ""
+mouse_image = ""
 
 #Sound
 sound_image = "Images/UI/Active.png"
@@ -74,6 +77,7 @@ textinput = textInput.TextInput()
 pause = False
 bulletDelay = 0
 bulletDelayLoop = False
+teclado = False
 
 player = player.Player()
 damage = damage.Damage()
@@ -110,7 +114,40 @@ while not gameLoop:
                     gameLoop = True
                 elif event.key == pygame.K_RETURN and gameState == 0 and cursor_Y == Constants.Y / 100 * 75:
                     optionSelectionSound.play()
+                    gameState = 5
+                    cursor_porcent_Y = 50
+                    cursor_porcent_X = -500
+                elif event.key == pygame.K_RIGHT and gameState == 5 and cursor_porcent_Y == 50:
+                    optionSelectionSound.play()
+                    cursor_porcent_X = 200
+                elif event.key == pygame.K_LEFT and gameState == 5 and cursor_porcent_Y == 50:
+                    optionSelectionSound.play()
+                    cursor_porcent_X = -500
+                elif event.key == pygame.K_DOWN and gameState == 5 and cursor_porcent_Y == 50:
+                    optionSelectionSound.play()
+                    cursor_porcent_Y = 90
+                    cursor_porcent_X = 0
+                elif event.key == pygame.K_UP and gameState == 5 and cursor_porcent_Y == 90:
+                    optionSelectionSound.play()
+                    cursor_porcent_Y = 50
+                    cursor_porcent_X = -500
+                elif event.key == pygame.K_RETURN and gameState == 5 and cursor_porcent_Y == 90:
+                    optionSelectionSound.play()
+                    cursor_porcent_X = 50
+                    cursor_porcent_Y = 75
+                    gameState = 0
+                elif event.key == pygame.K_RETURN and gameState == 5 and cursor_porcent_Y == 50 and cursor_porcent_X > 150 and cursor_porcent_X < 250:
                     gameState = 1
+                    player.control = "Mouse"
+                    damage.control = "Mouse"
+                    bulletDelay = 0
+                    bulletDelayLoop = False
+                elif event.key == pygame.K_RETURN and gameState == 5 and cursor_porcent_Y == 50 and cursor_porcent_X > -550 and cursor_porcent_X < -450:
+                    gameState = 1
+                    bulletDelay = 0
+                    bulletDelayLoop = False
+                    player.control = "Teclado"
+                    damage.control = "Teclado"
                 elif event.key == pygame.K_RETURN and gameState == 0 and cursor_Y == Constants.Y / 100 * 85:
                     optionSelectionSound.play()
                     gameState = 2
@@ -457,14 +494,23 @@ while not gameLoop:
                         optionSelectionSound.set_volume(0.1)
                         optionSelectionSound.play()
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and gameState == 1 and player.control == "Teclado":
+                    bulletDelay = True
+                    bulletDelayLoop = 0
+                    teclado = True
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE and gameState == 1 and player.control == "Teclado":
+                    bulletDelay = False
+                    bulletDelayLoop = 0
+                    teclado = False
 
-            if event.type == pygame.MOUSEBUTTONDOWN and gameState == 1:
+            if event.type == pygame.MOUSEBUTTONDOWN and gameState == 1 and player.control == "Mouse":
                 bulletDelay = True
                 bulletDelayLoop = 0
-            elif event.type == pygame.MOUSEBUTTONUP and gameState == 1:
+            elif event.type == pygame.MOUSEBUTTONUP and gameState == 1 and player.control == "Mouse":
                 bulletDelay = False
                 bulletDelayLoop = 0
-
 
         # Game Over
         if gameState == -1:
@@ -499,6 +545,8 @@ while not gameLoop:
                     Constants.ASTEROID_SUMMON_TIME = 60
                     player.life = 4
                     damage.damageSprite = 0
+                    cursor_porcent_X = 50
+                    cursor_porcent_Y = 75
 
                 Constants.screen.blit(background_image, [0, 0])
                 texto1 = font.render("Fim de jogo! Sua pontuação final foi: " + str(score), True, Constants.WHITE)
@@ -587,35 +635,58 @@ while not gameLoop:
                 image = "Images/Background/Full_Background.png"
                 background_image = pygame.image.load(image).convert()
 
-            if bulletDelay == True:
+            if bulletDelay == True and teclado == True and player.control == "Teclado":
                 if bulletDelayLoop % 15 == 0 and bulletDelayLoop != 0:
                     click_do_mouse.play()
                     # Fire a bullet if the user clicks the mouse button
                     shot = bullet.Bullet()
                     # Set the bullet to where the player is
-                    shot.rect.x = pos[0]+44
-                    shot.rect.y = pos[1]-60
+                    shot.rect.x = player.rect.x + 44
+                    shot.rect.y = player.rect.y - 60
                     #Add the bullet to the lists
                     all_sprites_list.add(shot)
                     bullet_list.add(shot)
                     bulletDelayLoop = 0
                 bulletDelayLoop +=1
 
-            pos = pygame.mouse.get_pos()
+            elif bulletDelay == True and player.control == "Mouse":
+                if bulletDelayLoop % 15 == 0 and bulletDelayLoop != 0:
+                    click_do_mouse.play()
+                    # Fire a bullet if the user clicks the mouse button
+                    shot = bullet.Bullet()
+                    # Set the bullet to where the player is
+                    shot.rect.x = player.rect.x + 44
+                    shot.rect.y = player.rect.y - 60
+                    #Add the bullet to the lists
+                    all_sprites_list.add(shot)
+                    bullet_list.add(shot)
+                    bulletDelayLoop = 0
+                bulletDelayLoop +=1
 
             Constants.screen.blit(background_image, background_position)
+
             scoreText = font.render("SCORE: " + str(score), True, Constants.WHITE)
 
             lifeText = font.render("Vidas: " + str(player.life), True, Constants.WHITE)
 
+            if player.control == "Teclado" and tempo < 300:
+                control_image = "Images/UI/Arrows.png"
+                control_image = pygame.image.load(control_image)
+                Constants.screen.blit(control_image, (Constants.X - 400, Constants.Y - 300))
+            elif player.control == "Mouse" and tempo < 300:
+                control_image = "Images/UI/Mouse.png"
+                control_image = pygame.image.load(control_image)
+                Constants.screen.blit(control_image, (Constants.X - 300, Constants.Y - 300))
+
             # Summon meteors
-            if tempo > 200:
+            if tempo > 300:
                 if loop_game % Constants.ASTEROID_SUMMON_TIME == 0:
                     asteroid = meteor.Meteor()
                     asteroid.reposicionar(Constants.X)
                     meteor_list.add(asteroid)
                 loop_game += 1
-            tempo += 1
+            if tempo <= 300:
+                tempo += 1
 
             # --- Game Logic
 
@@ -646,7 +717,7 @@ while not gameLoop:
             if player_hit_list:
                 player.life -= 1
                 damage.damageSprite += 1
-                Constants.screen.blit(damage.image, pos)
+                Constants.screen.blit(damage.image, (player.rect.x, player.rect.y))
                 playerHitSound.play()
                 if player.life == 0:
                     Constants.ASTEROID_MOVE_SPEED = 1
@@ -662,7 +733,8 @@ while not gameLoop:
                         all_sprites_list.remove(asteroid)
                     gameState = -1
             else:
-                Constants.screen.blit(player.image, pos)
+                Constants.screen.blit(player.image, (player.rect.x, player.rect.y))
+
             if score >= 20 and Constants.ASTEROID_MOVE_SPEED == 1:
                 background_position[1] = -3840
                 Constants.ASTEROID_MOVE_SPEED = 3
@@ -865,17 +937,67 @@ while not gameLoop:
                     cursor_loop = 0
             cursor_loop += 1
 
+        # Controls
+        if gameState == 5:
+            # Background Image
+            if image != "Images/Background/lightBlue.png":
+                image = "Images/Background/lightBlue.png"
+                background_image = pygame.image.load(image)
+            Constants.screen.blit(background_image, [0, 0])
+
+            # Control Image
+            if keyboard_image != "Images/UI/Arrows.png":
+                keyboard_image = "Images/UI/Arrows.png"
+                k_image = pygame.image.load(keyboard_image)
+            Constants.screen.blit(k_image, [Constants.X / 2 - 500, Constants.Y / 2 - k_image.get_rect().size[0] / 2])
+            if mouse_image != "Images/UI/Mouse.png":
+                mouse_image = "Images/UI/Mouse.png"
+                m_image = pygame.image.load(mouse_image)
+            Constants.screen.blit(m_image, [Constants.X / 2 + 150, Constants.Y / 2 - m_image.get_rect().size[0] / 2])
+
+            # Option Texts
+            controles = font.render("Controles", True, Constants.WHITE)
+            Constants.screen.blit(controles, (Constants.X / 2 - controles.get_rect().size[0] / 2, 70))
+
+            voltar = font.render("Voltar", True, Constants.BLACK)
+            Constants.screen.blit(voltar, (Constants.X / 2 - voltar.get_rect().size[0] / 2, Constants.Y / 100 * 90))
+
+            cursor = "Images/Spaceship/playerShip2_green.png"
+
+
+            cursor_X = Constants.X / 2 - voltar.get_rect().size[0] + cursor_porcent_X
+            cursor_Y = Constants.Y / 100 * cursor_porcent_Y
+            cursor_image = pygame.image.load(cursor).convert()
+            cursor_image.set_colorkey(Constants.BLACK)
+            cursor_image = pygame.transform.scale(cursor_image, (44, 32))
+            cursor_image = pygame.transform.rotate(cursor_image, -90)
+            Constants.screen.blit(cursor_image, (cursor_X, cursor_Y))
+
+            if cursor_side == "R" and cursor_loop <= 7:
+                cursor_porcent_X -= 1
+                if cursor_loop == 7:
+                    cursor_side = "L"
+                    cursor_loop = 0
+            elif cursor_side == "L" and cursor_loop <= 7:
+                cursor_porcent_X += 1
+                if cursor_loop == 7:
+                    cursor_side = "R"
+                    cursor_loop = 0
+            cursor_loop += 1
 
     else:
         if pause == True:
             pauseText = font.render("Pause!", True, Constants.WHITE)
             Constants.screen.blit(pauseText, [Constants.X / 2 - pauseText.get_rect().size[0] / 2, Constants.Y/2])
 
+
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if gameState == 1 and (event.key == pygame.K_p or event.key == pygame.K_ESCAPE):
-                    pygame.mouse.set_pos(pos)
+                if gameState == 1 and event.key == pygame.K_p:
+                    pygame.mouse.set_pos([player.rect.x, player.rect.y])
                     pause = False
+                if gameState == 1 and pause == True and event.key == pygame.K_ESCAPE:
+                    gameLoop = True
 
     pygame.display.update()
     clock.tick(60)
