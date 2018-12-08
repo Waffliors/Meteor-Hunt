@@ -836,27 +836,27 @@ while not gameLoop:
 
             score1 = font.render("1.", True, Constants.WHITE)
             Constants.screen.blit(score1, (Constants.X / 2 - 300, Constants.Y / 100 * 20))
-            score1_nome = font.render(str(listaDeRankings[0]), True, Constants.WHITE)
+            score1_nome = font.render(str(listaDeRankings[0]) + " Pontos", True, Constants.WHITE)
             Constants.screen.blit(score1_nome, (Constants.X / 2 - 250, Constants.Y / 100 * 20))
 
             score2 = font.render("2.", True, Constants.WHITE)
             Constants.screen.blit(score2, (Constants.X / 2 - 300, Constants.Y / 100 * 30))
-            score2_nome = font.render(str(listaDeRankings[1]), True, Constants.WHITE)
+            score2_nome = font.render(str(listaDeRankings[1]) + " Pontos", True, Constants.WHITE)
             Constants.screen.blit(score2_nome, (Constants.X / 2 - 250, Constants.Y / 100 * 30))
 
             score3 = font.render("3.", True, Constants.WHITE)
             Constants.screen.blit(score3, (Constants.X / 2 - 300, Constants.Y / 100 * 40))
-            score3_nome = font.render(str(listaDeRankings[2]), True, Constants.WHITE)
+            score3_nome = font.render(str(listaDeRankings[2]) + " Pontos", True, Constants.WHITE)
             Constants.screen.blit(score3_nome, (Constants.X / 2 - 250, Constants.Y / 100 * 40))
 
             score4 = font.render("4.", True, Constants.WHITE)
             Constants.screen.blit(score4, (Constants.X / 2 - 300, Constants.Y / 100 * 50))
-            score4_nome = font.render(str(listaDeRankings[3]), True, Constants.WHITE)
+            score4_nome = font.render(str(listaDeRankings[3]) + " Pontos", True, Constants.WHITE)
             Constants.screen.blit(score4_nome, (Constants.X / 2 - 250, Constants.Y / 100 * 50))
 
             score5 = font.render("5.", True, Constants.WHITE)
             Constants.screen.blit(score5, (Constants.X / 2 - 300, Constants.Y / 100 * 60))
-            score5_nome = font.render(str(listaDeRankings[4]), True, Constants.WHITE)
+            score5_nome = font.render(str(listaDeRankings[4]) + " Pontos", True, Constants.WHITE)
             Constants.screen.blit(score5_nome, (Constants.X / 2 - 250, Constants.Y / 100 * 60))
 
             reset = font.render("Resetar Pontuações", True, Constants.BLACK)

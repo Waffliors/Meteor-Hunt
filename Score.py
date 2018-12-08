@@ -3,8 +3,8 @@ import pickle
 class Ranking(object):
 
     def __init__(self, nome, pontos):
-        self.__nome = nome + " - "
-        self.__pontos = str(pontos) + " Pontos"
+        self.__nome = nome
+        self.__pontos = pontos
 
     def __repr__(self):
         return "%s %s" % (self.__nome, self.__pontos)
@@ -22,7 +22,7 @@ class Ranking(object):
         return listaDeRankings
 
     def resetSave(self, listaDeRankings):
-        rank = Ranking(" ", " ")
+        rank = Ranking(" ", 00000000)
         listaDeRankings = [rank, rank, rank, rank, rank, rank]
         outFile = open('save.pkl', 'wb')
         pickle.dump(listaDeRankings, outFile)
